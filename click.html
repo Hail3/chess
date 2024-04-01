@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chess App</title>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #e4e3e3;
+    }
+
+
+    .row {
+      display: flex;
+    }
+
+    .square {
+      width: 70px;
+      height: 70px;
+      padding: 10px;
+      border: none;
+    }
+
+    .square img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .black {
+      background-color: #858585;
+    }
+    .white{
+      background-color: white;
+    }
+    .dot {
+        height: 10px;
+        width: 10px;
+        background-color: blue;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+  </style>
+  <link rel="icon" href="images/png/white-pawn.png">
+</head>
+<body>
+  <script>
+    class Bishop {
+  constructor(color, path) {
+    this.color = color;
+    this.path = path;
+  }
+}
+
+class Knight {
+  constructor(color, path) {
+    this.color = color;
+    this.path = path;
+  }
+}
+
+var chessboard = document.createElement('div');
+document.body.appendChild(chessboard);
+for (var i = 0; i < 8; i++) {
+  var row = document.createElement('div');
+  row.classList.add('row');
+  chessboard.appendChild(row);
+
+  for (var j = 0; j < 8; j++) {
+    var square = document.createElement('div');
+    square.classList.add('square');
+    square.classList.add(String.fromCharCode(65+i)+(j+1));
+    if ((i + j) % 2 === 0) {
+      square.classList.add('black');
+    } else {
+      square.classList.add('white');
+    }
+    row.appendChild(square);
+  }
+}
+
+var board = {
+  'A1': new Bishop('black', 'images/png/black-bishop.png'),
+  'B1': new Knight('black', 'images/png/black-Knight.png'),
+}
+
+function createPiece(squareId) {
+  var piece = board[squareId];
+  var pieceImg = document.createElement('img');
+  pieceImg.id = squareId;
+  pieceImg.src = piece.path;
+  pieceImg.width = 50;
+  pieceImg.height = 50;
+  pieceImg.draggable = true;
+  return pieceImg;
+}
+
+var selectedPiece = null;
+
+function movePiece(sourceSquareId, targetSquareId) {
+  if (board.hasOwnProperty(sourceSquareId) && !board.hasOwnProperty(targetSquareId)) {
+    var piece = board[sourceSquareId];
+    delete board[sourceSquareId];
+    board[targetSquareId] = piece;
+    var sourceSquare = document.getElementsByClassName(sourceSquareId)[0];
+    var targetSquare = document.getElementsByClassName(targetSquareId)[0];
+    targetSquare.appendChild(sourceSquare.firstChild);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var squares = document.querySelectorAll('.square');
+  squares.forEach(function(square) {
+    square.addEventListener('click', function() {
+      var squareId = square.classList.item(1);
+      if (selectedPiece) {
+        movePiece(selectedPiece, squareId);
+        selectedPiece = null;
+        // Remove all dots
+        var dots = document.querySelectorAll('.dot');
+        dots.forEach(function(dot) {
+          dot.remove();
+        });
+      } else if (board.hasOwnProperty(squareId)) {
+        selectedPiece = squareId;
+        // Add dots to all empty squares
+        squares.forEach(function(square) {
+          var squareId = square.classList.item(1);
+          if (!board.hasOwnProperty(squareId)) {
+            var dot = document.createElement('span');
+            dot.classList.add('dot');
+            square.appendChild(dot);
+          }
+        });
+      }
+    });
+  });
+});
+
+
+
+document.getElementsByClassName('A1')[0].appendChild(createPiece('A1'));
+document.getElementsByClassName('B1')[0].appendChild(createPiece('B1'));
+
+  </script>
+</body>
+</html>

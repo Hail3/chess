@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chess App</title>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #e4e3e3;
+    }
+
+
+    .row {
+      display: flex;
+    }
+
+    .square {
+      width: 70px;
+      height: 70px;
+      padding: 10px;
+      border: none;
+    }
+
+    .square img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .black {
+      background-color: #858585;
+    }
+    .white{
+      background-color: white;
+    }
+  </style>
+  <link rel="icon" href="images/png/white-pawn.png">
+</head>
+<body>
+<script>
+class Bishop {
+  constructor(color, path) {
+    this.color = color;
+    this.path = path;
+  }
+}
+
+class Knight {
+  constructor(color, path) {
+    this.color = color;
+    this.path = path;
+  }
+}
+
+var chessboard = document.createElement('div');
+document.body.appendChild(chessboard);
+for (var i = 0; i < 8; i++) {
+  var row = document.createElement('div');
+  row.classList.add('row');
+  chessboard.appendChild(row);
+
+  for (var j = 0; j < 8; j++) {
+    var square = document.createElement('div');
+    square.classList.add('square');
+    square.classList.add(String.fromCharCode(65+i)+(j+1));
+    square.setAttribute('ondrop', 'drop(event)');
+    square.setAttribute('ondragover', 'allowDrop(event)');
+    if ((i + j) % 2 === 0) {
+      square.classList.add('black');
+    }else{
+      square.classList.add('white');
+    }
+    row.appendChild(square);
+  }
+}
+
+var board = {
+  'A1': new Bishop('black', 'images/png/black-bishop.png'),
+  'B1': new Knight('black', 'images/png/black-Knight.png'),
+}
+
+function createPiece(squareId) {
+  var piece = board[squareId];
+  var pieceImg = document.createElement('img');
+  pieceImg.id = squareId;
+  pieceImg.src = piece.path;
+  pieceImg.width = 50;
+  pieceImg.height = 50;
+  pieceImg.draggable = true;
+  pieceImg.setAttribute('ondragstart', 'drag(event)');
+  return pieceImg;
+}
+
+document.getElementsByClassName('A1')[0].appendChild(createPiece('A1'));
+document.getElementsByClassName('B1')[0].appendChild(createPiece('B1'));
+
+function allowDrop(ev) {
+  ev.preventDefault();
+}
+
+function drag(ev) {
+  ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+  ev.preventDefault();
+  var data = ev.dataTransfer.getData("text");
+  var draggedElement = document.getElementById(data);
+
+  if (typeof board[data] === 'undefined') {
+    return;
+  }
+
+  if (ev.target.classList.contains('square')) {
+    ev.target.appendChild(draggedElement);
+    var oldLocation = data;
+    var newLocation = ev.target.getAttribute('class').split(' ')[1];
+
+    var pieceClass = board[oldLocation].constructor;
+    var pieceColor = board[oldLocation].color;
+
+    board[newLocation] = new pieceClass(pieceColor, board[oldLocation].path);
+    draggedElement.id = newLocation;
+
+    board[oldLocation] = 0;
+  }
+  console.log(board);
+}
+  </script>
+</body>
+</html>
